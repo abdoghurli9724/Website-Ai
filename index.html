@@ -264,7 +264,7 @@
         <button class="icon-btn" type="button"><i class="fa-solid fa-bars"></i></button>
         <div class="top-buttons">
             <button class="api-key-btn" id="openKeyModalBtn" type="button"><i class="fa-solid fa-key"></i> Gemini API Key</button>
-            <div class="model-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 2.5 Flash</div>
+            <div class="model-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 3.6 Flash</div>
         </div>
     </header>
 
@@ -273,7 +273,7 @@
         <div class="modal-content">
             <h3>إعدادات Gemini API Key</h3>
             <p>أدخل مفتاح Google Gemini API الخاص بك. يتم حفظ المفتاح بأمان داخل متصفحك فقط.</p>
-            <input type="password" id="userApiKeyInput" placeholder="AIzaSy..." />
+            <input type="password" id="userApiKeyInput" placeholder="AQ.Ab..." />
             <div class="modal-actions">
                 <button id="saveKeyBtn" class="save-btn" type="button">حفظ</button>
                 <button id="closeModalBtn" class="close-btn" type="button">إلغاء</button>
@@ -319,7 +319,6 @@
             const saveKeyBtn = document.getElementById('saveKeyBtn');
             const userApiKeyInput = document.getElementById('userApiKeyInput');
 
-            // فتح النافذة المنبثقة للمفتاح
             if (openKeyModalBtn) {
                 openKeyModalBtn.addEventListener('click', () => {
                     userApiKeyInput.value = localStorage.getItem('custom_gemini_key') || '';
@@ -327,14 +326,12 @@
                 });
             }
 
-            // إغلاق النافذة
             if (closeModalBtn) {
                 closeModalBtn.addEventListener('click', () => {
                     keyModal.style.display = 'none';
                 });
             }
 
-            // حفظ المفتاح في LocalStorage
             if (saveKeyBtn) {
                 saveKeyBtn.addEventListener('click', () => {
                     const key = userApiKeyInput.value.trim();
@@ -349,7 +346,6 @@
                 });
             }
 
-            // التكيف التلقائي لارتفاع مربع النص
             if (userInput) {
                 userInput.addEventListener('input', () => {
                     userInput.style.height = 'auto';
@@ -387,8 +383,8 @@
                 }
 
                 try {
-                    // رابط الاتصال بموديل Gemini 2.5 Flash
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${customKey}`;
+                    // تحديث الموديل إلى gemini-3.6-flash
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${customKey}`;
                     
                     const response = await fetch(url, {
                         method: "POST",

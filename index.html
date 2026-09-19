@@ -15,23 +15,25 @@ body{background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display
 
 /* شاشة إدخال المفتاح */
 #keyScreen{position:fixed;inset:0;background:linear-gradient(135deg,#0f1117 0%,#1a1d35 100%);display:flex;align-items:center;justify-content:center;z-index:100}
-.key-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:48px 40px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.key-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:48px 40px;max-width:460px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .key-card .logo{font-size:52px;margin-bottom:12px}
 .key-card h1{font-size:26px;margin-bottom:8px}
-.key-card p{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:24px}
+.key-card p{color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:20px}
+.key-card select{width:100%;padding:13px 16px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;margin-bottom:10px;outline:none;cursor:pointer}
 .key-card input{width:100%;padding:14px 16px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;margin-bottom:8px;outline:none;transition:.2s}
 .key-card input:focus{border-color:var(--accent)}
 .key-card button{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;margin-top:12px;transition:.2s}
 .key-card button:hover{opacity:.9;transform:translateY(-1px)}
 .key-error{color:#ff6b6b;font-size:13px;margin-top:10px;min-height:18px}
 .key-note{color:var(--muted);font-size:12px;margin-top:16px;line-height:1.7}
+.key-note a{color:var(--accent2);text-decoration:none}
 
 /* الهيدر */
-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--panel);border-bottom:1px solid var(--border)}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
 header .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
 header .brand span.dot{width:10px;height:10px;background:#00d26a;border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-header .actions{display:flex;gap:8px}
+header .actions{display:flex;gap:8px;align-items:center}
 .btn-icon{background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;transition:.2s}
 .btn-icon:hover{border-color:var(--accent)}
 
@@ -68,23 +70,36 @@ header .actions{display:flex;gap:8px}
 </head>
 <body>
 
-<!-- شاشة إدخال مفتاح OpenAI -->
+<!-- شاشة إدخال المفتاح -->
 <div id="keyScreen">
   <div class="key-card">
     <div class="logo">🤖</div>
     <h1>مرحباً بك في ذكاء</h1>
-    <p>لبدء المحادثة مع الذكاء الاصطناعي، يرجى إدخال مفتاح OpenAI API الخاص بك.</p>
-    <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off">
+    <p>اختر مزود الخدمة وأدخل مفتاح API الخاص بك لبدء المحادثة مع الذكاء الاصطناعي.</p>
+
+    <select id="providerSelect" onchange="updateHint()">
+      <option value="openai">OpenAI (مدفوع)</option>
+      <option value="deepseek" selected>DeepSeek (رخيص جداً)</option>
+      <option value="openrouter">OpenRouter (مجاني)</option>
+    </select>
+
+    <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off" onkeydown="if(event.key==='Enter')saveKey()">
     <button onclick="saveKey()">بدء المحادثة</button>
     <div class="key-error" id="keyError"></div>
-    <div class="key-note">🔒 مفتاحك يُحفظ محلياً في متصفحك فقط ولا يُرسل لأي خادم غير OpenAI. يمكنك الحصول على مفتاح من platform.openai.com</div>
+    <div class="key-note" id="keyHint"></div>
+    <div class="key-note">🔒 مفتاحك يُحفظ محلياً في متصفحك فقط ولا يُرسل لأي خادم غير مزود الخدمة المختار.</div>
   </div>
 </div>
 
 <!-- الهيدر -->
 <header>
-  <div class="brand"><span class="dot"></span> ذكاء - المساعد الذكي</div>
+  <div class="brand"><span class="dot"></span> ذكاء - المساعد الذكي <span id="providerBadge" style="font-size:12px;color:var(--muted);font-weight:400"></span></div>
   <div class="actions">
+    <select id="topProvider" class="btn-icon" onchange="changeProvider(this.value)" style="padding:8px 10px">
+      <option value="openai">OpenAI</option>
+      <option value="deepseek">DeepSeek</option>
+      <option value="openrouter">OpenRouter</option>
+    </select>
     <button class="btn-icon" onclick="newChat()">محادثة جديدة</button>
     <button class="btn-icon" onclick="changeKey()">تغيير المفتاح</button>
   </div>
@@ -100,39 +115,101 @@ header .actions{display:flex;gap:8px}
 </div>
 
 <script>
-const API_URL = "https://api.openai.com/v1/chat/completions";
-const MODEL = "gpt-4o-mini";
-let apiKey = null;
-let messages = []; // سجل المحادثة الكامل
+// ===== إعدادات المزودين =====
+const PROVIDERS = {
+  openai: {
+    name: "OpenAI",
+    url: "https://api.openai.com/v1/chat/completions",
+    model: "gpt-4o-mini",
+    prefix: "sk-",
+    hint: 'احصل على مفتاح من <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a> (يتطلب رصيداً مدفوعاً)'
+  },
+  deepseek: {
+    name: "DeepSeek",
+    url: "https://api.deepseek.com/chat/completions",
+    model: "deepseek-chat",
+    prefix: "sk-",
+    hint: 'احصل على مفتاح من <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com/api_keys</a> (أسعار رمزية جداً)'
+  },
+  openrouter: {
+    name: "OpenRouter",
+    url: "https://openrouter.ai/api/v1/chat/completions",
+    model: "deepseek/deepseek-chat-v3.1:free",
+    prefix: "sk-or-",
+    hint: 'احصل على مفتاح مجاني من <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a>'
+  }
+};
 
-// ===== إدارة المفتاح =====
+const SYSTEM_PROMPT = "أنت مساعد ذكي ودود يجيب باللغة العربية بشكل واضح ومفيد.";
+
+let apiKey = null;
+let provider = localStorage.getItem("provider") || "deepseek";
+let messages = []; // سجل المحادثة الكامل (الذاكرة)
+
+// ===== إدارة المفتاح والمزود =====
+function updateHint(){
+  const p = document.getElementById("providerSelect").value;
+  document.getElementById("keyHint").innerHTML = PROVIDERS[p].hint;
+  document.getElementById("apiKeyInput").placeholder = PROVIDERS[p].prefix + "...";
+}
+
 function saveKey(){
   const input = document.getElementById("apiKeyInput").value.trim();
   const err = document.getElementById("keyError");
-  if(!input.startsWith("sk-") || input.length < 20){
-    err.textContent = "⚠ المفتاح غير صالح، يجب أن يبدأ بـ sk-";
+  const p = document.getElementById("providerSelect").value;
+  if(!input.startsWith(PROVIDERS[p].prefix) || input.length < 20){
+    err.textContent = "⚠ المفتاح غير صالح لمزود " + PROVIDERS[p].name + " (يجب أن يبدأ بـ " + PROVIDERS[p].prefix + ")";
     return;
   }
   err.textContent = "";
+  provider = p;
   apiKey = input;
+  localStorage.setItem("provider", p);
   localStorage.setItem("openai_key", input);
   document.getElementById("keyScreen").style.display = "none";
-  addBotMessage("مرحباً! 👋 أنا مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟");
+  document.getElementById("topProvider").value = p;
+  updateBadge();
+  addBotMessage("مرحباً! 👋 أنا مساعدك الذكي عبر " + PROVIDERS[p].name + ". كيف يمكنني مساعدتك اليوم؟");
+}
+
+function changeProvider(p){
+  provider = p;
+  localStorage.setItem("provider", p);
+  localStorage.removeItem("openai_key");
+  apiKey = null;
+  messages = [];
+  document.getElementById("keyScreen").style.display = "flex";
+  document.getElementById("providerSelect").value = p;
+  document.getElementById("apiKeyInput").value = "";
+  document.getElementById("keyError").textContent = "";
+  updateHint();
 }
 
 function changeKey(){
   localStorage.removeItem("openai_key");
   apiKey = null;
   document.getElementById("keyScreen").style.display = "flex";
+  document.getElementById("providerSelect").value = provider;
   document.getElementById("apiKeyInput").value = "";
+  updateHint();
 }
 
-// عند التحميل: استرجاع المفتاح المحفوظ
+function updateBadge(){
+  document.getElementById("providerBadge").textContent = apiKey ? "(" + PROVIDERS[provider].name + " • " + PROVIDERS[provider].model + ")" : "";
+}
+
+// عند التحميل: استرجاع المفتاح والمزود المحفوظين
 window.addEventListener("load", () => {
-  const saved = localStorage.getItem("openai_key");
-  if(saved){
-    apiKey = saved;
+  const savedProvider = localStorage.getItem("provider") || "deepseek";
+  const savedKey = localStorage.getItem("openai_key");
+  document.getElementById("providerSelect").value = savedProvider;
+  document.getElementById("topProvider").value = savedProvider;
+  updateHint();
+  if(savedKey && savedKey.startsWith(PROVIDERS[savedProvider].prefix)){
+    provider = savedProvider;
+    apiKey = savedKey;
     document.getElementById("keyScreen").style.display = "none";
+    updateBadge();
     addBotMessage("مرحباً بعودتك! 👋 كيف يمكنني مساعدتك؟");
   }
 });
@@ -173,7 +250,7 @@ function removeTyping(){
   if(t) t.remove();
 }
 
-// إرسال الرسالة والاتصال بـ OpenAI
+// إرسال الرسالة والاتصال بالمزود
 async function sendMessage(){
   const input = document.getElementById("userInput");
   const text = input.value.trim();
@@ -186,26 +263,38 @@ async function sendMessage(){
   messages.push({role:"user", content:text});
 
   try{
-    const res = await fetch(API_URL, {
+    const headers = {
+      "Content-Type":"application/json",
+      "Authorization":"Bearer " + apiKey
+    };
+    // OpenRouter يتطلب هذين الترويسين اختيارياً لكنهما مفيدان
+    if(provider === "openrouter"){
+      headers["HTTP-Referer"] = location.origin || "https://localhost";
+      headers["X-Title"] = "Zakaa AI Chat";
+    }
+
+    const res = await fetch(PROVIDERS[provider].url, {
       method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":"Bearer " + apiKey
-      },
+      headers: headers,
       body: JSON.stringify({
-        model: MODEL,
+        model: PROVIDERS[provider].model,
         messages: [
-          {role:"system", content:"أنت مساعد ذكي ودود يجيب باللغة العربية بشكل واضح ومفيد."}, // تعليمات النظام
+          {role:"system", content: SYSTEM_PROMPT},
           ...messages
         ],
         temperature: 0.7,
-        max_tokens: 2000
+        max_tokens: 2000,
+        stream: false
       })
     });
 
     if(!res.ok){
       const e = await res.json().catch(()=>({}));
-      throw new Error(e.error?.message || `خطأ HTTP ${res.status}`);
+      let msg = e.error?.message || ("خطأ HTTP " + res.status);
+      if(res.status === 401) msg = "المفتاح غير صالح أو منتهي (401). تحقق من المفتاح.";
+      if(res.status === 402 || /credit|balance|billing/i.test(msg)) msg = "لا يوجد رصيد كافٍ في حسابك. يرجى شحن الحساب لدى " + PROVIDERS[provider].name + ".";
+      if(res.status === 429) msg = "تم تجاوز حد الطلبات (429). انتظر قليلاً ثم أعد المحاولة.";
+      throw new Error(msg);
     }
 
     const data = await res.json();
@@ -215,6 +304,8 @@ async function sendMessage(){
     addBotMessage(reply);
   }catch(err){
     removeTyping();
+    // إزالة رسالة المستخدم من الذاكرة عند الفشل حتى لا تتكرر
+    messages.pop();
     addBotMessage("❌ حدث خطأ: " + err.message);
   }finally{
     setBusy(false);

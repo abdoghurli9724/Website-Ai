@@ -51,48 +51,49 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function handleSend() {
-        const text = userInput.value.trim();
-        if (!text) return;
+    const text = userInput.value.trim();
+    if (!text) return;
 
-        if (welcomeScreen) welcomeScreen.style.display = 'none';
+    if (welcomeScreen) welcomeScreen.style.display = 'none';
 
-        appendMessage(text, 'user-message');
-        userInput.value = '';
+    appendMessage(text, 'user-message');
+    userInput.value = '';
 
-        const loadingId = appendMessage("جاري التفكير...", 'bot-message');
-        const customKey = localStorage.getItem('custom_gemini_key');
+    const loadingId = appendMessage("جاري التفكير...", 'bot-message');
+    const customKey = localStorage.getItem('custom_gemini_key');
 
-        if (!customKey) {
-            document.getElementById(loadingId).innerText = "يرجى الضغط على زر (إدخال Gemini API Key) في الأعلى وإدخال مفتاحك المجاني للبدء.";
-            return;
-        }
-
-        try {
-            // استخدام نموذج gemini-2.5-flash الرسمي
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${customKey}`;
-            
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: text }] }]
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                const reply = data.candidates[0].content.parts[0].text;
-                document.getElementById(loadingId).innerText = reply;
-            } else {
-                document.getElementById(loadingId).innerText = "خطأ: " + (data.error?.message || "تأكد من صحة المفتاح الخاص بك.");
-            }
-
-        } catch (error) {
-            console.error(error);
-            document.getElementById(loadingId).innerText = "حدث خطأ أثناء الاتصال بالخادم.";
-        }
+    if (!customKey) {
+        document.getElementById(loadingId).innerText = "يرجى الضغط على زر (إدخال Gemini API Key) في الأعلى وإدخال مفتاحك المجاني للبدء.";
+        return;
     }
+
+    try {
+        // استخدام gemini-1.5-flash-latest مع حيلة تجاوز الكاش
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${customKey}&nocache=${Date.now()}`;
+        
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: text }] }]
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const reply = data.candidates[0].content.parts[0].text;
+            document.getElementById(loadingId).innerText = reply;
+        } else {
+            document.getElementById(loadingId).innerText = "خطأ: " + (data.error?.message || "تأكد من صحة المفتاح الخاص بك.");
+        }
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById(loadingId).innerText = "حدث خطأ أثناء الاتصال بالخادم.";
+    }
+}
+
 
     function appendMessage(text, className) {
         const msgDiv = document.createElement('div');

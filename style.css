@@ -1,165 +1,78 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-body {
-    background-color: #121212;
-    color: #ffffff;
+.top-buttons {
     display: flex;
-    flex-direction: column;
-    height: 100vh;
-    height: 100dvh; /* لحل مشكلة شريط المتصفح في الهواتف */
-    overflow: hidden;
+    gap: 8px;
 }
 
-/* الشريط العلوي */
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background-color: #121212;
-}
-
-.icon-btn {
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.upgrade-btn {
-    background-color: #2e265c;
-    color: #a78bfa;
-    border: none;
-    padding: 8px 16px;
+.api-key-btn {
+    background-color: #1f2937;
+    color: #e5e7eb;
+    border: 1px solid #374151;
+    padding: 8px 12px;
     border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-/* منطقة المحادثة */
-.chat-container {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-}
-
-.welcome-screen {
-    margin: auto;
-    text-align: center;
-}
-
-.welcome-screen h1 {
-    font-size: 20px;
-    font-weight: 500;
-    color: #e5e5e5;
-}
-
-.messages-list {
-    width: 100%;
-    max-width: 768px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.message {
-    padding: 10px 14px;
-    border-radius: 12px;
-    max-width: 85%;
-    line-height: 1.5;
-    font-size: 15px;
-    word-break: break-word;
-}
-
-.user-message {
-    background-color: #2a2a2a;
-    align-self: flex-start;
-}
-
-.bot-message {
-    background-color: transparent;
-    align-self: flex-end;
-    color: #d1d5db;
-}
-
-/* شريط الإدخال السفلي */
-.input-container {
-    padding: 8px 12px 16px;
-    background-color: #121212;
-    display: flex;
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
     justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
-.input-box {
-    width: 100%;
-    max-width: 768px;
+.modal-content {
     background-color: #1e1e1e;
-    border: 1px solid #2e2e2e;
-    border-radius: 20px;
-    padding: 10px 14px;
+    padding: 20px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid #333;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-}
-
-.input-box textarea {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: #fff;
-    resize: none;
-    outline: none;
-    font-size: 15px;
-    max-height: 100px;
-}
-
-.input-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.left-actions, .right-actions {
-    display: flex;
-    align-items: center;
     gap: 12px;
 }
 
-.action-btn, .model-select-btn {
-    background: transparent;
-    border: none;
-    color: #a1a1aa;
-    font-size: 15px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.modal-content h3 { font-size: 18px; color: #fff; }
+.modal-content p { font-size: 13px; color: #a1a1aa; line-height: 1.4; }
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background-color: #121212;
+    color: #fff;
+    outline: none;
 }
 
-.send-btn {
-    background-color: #e5e5e5;
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.save-btn {
+    background-color: #a78bfa;
     color: #000;
     border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
 }
 
-.text-xs { font-size: 10px; }
+.close-btn {
+    background-color: transparent;
+    color: #a1a1aa;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+}

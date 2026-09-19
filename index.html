@@ -2,36 +2,34 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI Chat Assistant</title>
+    <!-- مكتبة الأيقونات Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- شريط العلوية -->
     <header class="top-bar">
         <button class="icon-btn"><i class="fa-solid fa-bars"></i></button>
-        <button class="upgrade-btn"><i class="fa-solid fa-sparkles"></i> خطة الترقية</button>
+        <button class="upgrade-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> خطة الترقية</button>
     </header>
 
-    <!-- منطقة المحادثة -->
     <main class="chat-container" id="chatContainer">
         <div class="welcome-screen" id="welcomeScreen">
-            <h1 id="welcomeText">ما الذي يمكنني مساعدتك به اليوم؟</h1>
+            <h1>ما الذي يمكنني مساعدتك به اليوم؟</h1>
         </div>
         <div class="messages-list" id="messagesList"></div>
     </main>
 
-    <!-- شريط الإدخال السفلي -->
     <footer class="input-container">
         <div class="input-box">
             <textarea id="userInput" rows="1" placeholder="اسأل، تعلّم، تبادل الأفكار..."></textarea>
             <div class="input-actions">
                 <div class="left-actions">
-                    <button class="action-btn"><i class="fa-solid fa-plus"></i></button>
-                    <button class="action-btn"><i class="fa-regular fa-comment-dots"></i> <i class="fa-solid fa-chevron-down text-xs"></i></button>
-                    <button class="action-btn"><i class="fa-solid fa-desktop"></i></button>
+                    <button class="action-btn" title="إضافة"><i class="fa-solid fa-plus"></i></button>
+                    <button class="action-btn" title="خيارات"><i class="fa-regular fa-comment-dots"></i> <i class="fa-solid fa-chevron-down text-xs"></i></button>
+                    <button class="action-btn" title="الوضع"><i class="fa-solid fa-desktop"></i></button>
                 </div>
                 <div class="right-actions">
                     <button class="model-select-btn">نموذج <i class="fa-solid fa-chevron-down text-xs"></i></button>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Chat Assistant</title>
+    <!-- مكتبة الأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- ملف التنسيقات -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- الشريط العلوي -->
+    <header class="top-bar">
+        <button class="icon-btn" type="button"><i class="fa-solid fa-bars"></i></button>
+        <div class="top-buttons">
+            <button class="api-key-btn" id="openKeyModalBtn" type="button"><i class="fa-solid fa-key"></i> إدخال Gemini API Key</button>
+            <button class="upgrade-btn" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> خطة الترقية</button>
+        </div>
+    </header>
+
+    <!-- نافذة إدخال API Key -->
+    <div class="modal" id="keyModal">
+        <div class="modal-content">
+            <h3>إعدادات Gemini API Key</h3>
+            <p>أدخل مفتاح Google Gemini API المجاني الخاص بك. يتم حفظ المفتاح محلياً في متصفحك فقط ولا يتم مشاركته.</p>
+            <input type="password" id="userApiKeyInput" placeholder="AIzaSy..." />
+            <div class="modal-actions">
+                <button id="saveKeyBtn" class="save-btn" type="button">حفظ</button>
+                <button id="closeModalBtn" class="close-btn" type="button">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- منطقة المحادثة -->
+    <main class="chat-container" id="chatContainer">
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1 id="welcomeText">ما الذي يمكنني مساعدتك به اليوم؟</h1>
+        </div>
+        <div class="messages-list" id="messagesList"></div>
+    </main>
+
+    <!-- شريط الإدخال السفلي -->
+    <footer class="input-container">
+        <div class="input-box">
+            <textarea id="userInput" rows="1" placeholder="اسأل، تعلّم، تبادل الأفكار..."></textarea>
+            <div class="input-actions">
+                <div class="left-actions">
+                    <button class="action-btn" type="button"><i class="fa-solid fa-plus"></i></button>
+                    <button class="action-btn" type="button"><i class="fa-regular fa-comment-dots"></i> <i class="fa-solid fa-chevron-down text-xs"></i></button>
+                    <button class="action-btn" type="button"><i class="fa-solid fa-desktop"></i></button>
+                </div>
+                <div class="right-actions">
+                    <button class="model-select-btn" type="button">Gemini 1.5 <i class="fa-solid fa-chevron-down text-xs"></i></button>
+                    <button class="send-btn" id="sendBtn" type="button"><i class="fa-solid fa-arrow-up"></i></button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ملف الجافاسكربت -->
+    <script src="app.js"></script>
+</body>
+</html>

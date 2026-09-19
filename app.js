@@ -68,7 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${customKey}`;
+            // استخدام النموذج الأحدث جيل 2.0 المتاح للجميع
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${customKey}`;
             
             const response = await fetch(url, {
                 method: "POST",

@@ -1,14 +1,39 @@
-// مفتاح الـ API الخاص بـ Hugging Face (استبدله بمفتاحك)
-const API_KEY = "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; 
-const MODEL_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
-
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const chatContainer = document.getElementById('chatContainer');
 const welcomeScreen = document.getElementById('welcomeScreen');
 const messagesList = document.getElementById('messagesList');
 
-// إرسال الرسالة عند الضغط على الزر
+// العناصر الخاصة بـ Modal المايكرو
+const keyModal = document.getElementById('keyModal');
+const openKeyModalBtn = document.getElementById('openKeyModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const saveKeyBtn = document.getElementById('saveKeyBtn');
+const userApiKeyInput = document.getElementById('userApiKeyInput');
+
+// إدارة فتح وإغلاق النافذة المنبثقة
+openKeyModalBtn.addEventListener('click', () => {
+    userApiKeyInput.value = localStorage.getItem('custom_openai_key') || '';
+    keyModal.style.display = 'flex';
+});
+
+closeModalBtn.addEventListener('click', () => {
+    keyModal.style.display = 'none';
+});
+
+saveKeyBtn.addEventListener('click', () => {
+    const key = userApiKeyInput.value.trim();
+    if (key) {
+        localStorage.setItem('custom_openai_key', key);
+        alert('تم حفظ المفتاح الخاص بك بنجاح!');
+    } else {
+        localStorage.removeItem('custom_openai_key');
+        alert('تمت إزالة المفتاح الخاص، سيتم استخدام المفتاح العام إن وجد.');
+    }
+    keyModal.style.display = 'none';
+});
+
+// إرسال الرسالة
 sendBtn.addEventListener('click', handleSend);
 userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -21,30 +46,64 @@ async function handleSend() {
     const text = userInput.value.trim();
     if (!text) return;
 
-    // إخفاء شاشة الترحيب
-    welcomeScreen.style.display = 'none';
+    if (welcomeScreen) welcomeScreen.style.display = 'none';
 
-    // إضافية رسالة المستخدم
     appendMessage(text, 'user-message');
     userInput.value = '';
 
-    // إضافة مؤشر انتظار
     const loadingId = appendMessage("جاري التفكير...", 'bot-message');
 
-    // استدعاء الـ API
+    // التحقق هل لدى المستخدم مفتاح خاص محلي
+    const customKey = localStorage.getItem('custom_openai_key');
+
     try {
-        const response = await fetch(MODEL_URL, {
-            headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ inputs: text }),
-        });
-        const result = await response.json();
-        
-        // تحديث رسالة البوت بالرد
-        const botReply = result[0]?.generated_text || "حدث خطأ أثناء معالجة الطلب.";
-        document.getElementById(loadingId).innerText = botReply;
+        let reply = "";
+
+        if (customKey) {
+            // الخيار 1: الاتصال المباشر باستخدام مفتاح المستخدم الشخصي
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${customKey}`
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [
+                        { role: "system", content: "أنت مساعد ذكي ولطيف." },
+                        { role: "user", content: text }
+                    ]
+                })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                reply = data.choices[0].message.content;
+            } else {
+                reply = "خطأ في المفتاح الخاص بك: " + (data.error?.message || "تأكد من صحة المفتاح");
+            }
+
+        } else {
+            // الخيار 2: استخدام Netlify Function (مفتاح المشرف الآمن في Netlify)
+            const response = await fetch("/.netlify/functions/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: text })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                reply = data.choices[0].message.content;
+            } else {
+                reply = "يرجى إدخال API Key الخاص بك للبدء في استخدام الموقع.";
+            }
+        }
+
+        document.getElementById(loadingId).innerText = reply;
+
     } catch (error) {
-        document.getElementById(loadingId).innerText = "خطأ في الاتصال بالخادم.";
+        console.error(error);
+        document.getElementById(loadingId).innerText = "حدث خطأ أثناء الاتصال بالخادم.";
     }
 }
 
@@ -57,13 +116,4 @@ function appendMessage(text, className) {
     messagesList.appendChild(msgDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
     return id;
-}
-
-// -------------------------------------------------------------
-// إدارة تسجيل الدخول وتخزين بيانات المستخدمين بنمط JSON
-// -------------------------------------------------------------
-function saveUserToJSON(username, email) {
-    let users = JSON.parse(localStorage.getItem('users_db')) || [];
-    users.push({ username, email, loginTime: new Date().toISOString() });
-    localStorage.getItem('users_db', JSON.stringify(users));
 }

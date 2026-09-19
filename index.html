@@ -1,44 +1,72 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Chat Assistant</title>
-    <!-- مكتبة الأيقونات Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+// ضع مفتاح الـ API الخاص بـ OpenAI هنا
+const OPENAI_API_KEY = "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"; 
 
-    <header class="top-bar">
-        <button class="icon-btn"><i class="fa-solid fa-bars"></i></button>
-        <button class="upgrade-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> خطة الترقية</button>
-    </header>
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const chatContainer = document.getElementById('chatContainer');
+const welcomeScreen = document.getElementById('welcomeScreen');
+const messagesList = document.getElementById('messagesList');
 
-    <main class="chat-container" id="chatContainer">
-        <div class="welcome-screen" id="welcomeScreen">
-            <h1>ما الذي يمكنني مساعدتك به اليوم؟</h1>
-        </div>
-        <div class="messages-list" id="messagesList"></div>
-    </main>
+sendBtn.addEventListener('click', handleSend);
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+    }
+});
 
-    <footer class="input-container">
-        <div class="input-box">
-            <textarea id="userInput" rows="1" placeholder="اسأل، تعلّم، تبادل الأفكار..."></textarea>
-            <div class="input-actions">
-                <div class="left-actions">
-                    <button class="action-btn" title="إضافة"><i class="fa-solid fa-plus"></i></button>
-                    <button class="action-btn" title="خيارات"><i class="fa-regular fa-comment-dots"></i> <i class="fa-solid fa-chevron-down text-xs"></i></button>
-                    <button class="action-btn" title="الوضع"><i class="fa-solid fa-desktop"></i></button>
-                </div>
-                <div class="right-actions">
-                    <button class="model-select-btn">نموذج <i class="fa-solid fa-chevron-down text-xs"></i></button>
-                    <button class="send-btn" id="sendBtn"><i class="fa-solid fa-arrow-up"></i></button>
-                </div>
-            </div>
-        </div>
-    </footer>
+async function handleSend() {
+    const text = userInput.value.trim();
+    if (!text) return;
 
-    <script src="app.js"></script>
-</body>
-</html>
+    if (welcomeScreen) welcomeScreen.style.display = 'none';
+
+    // إضافة رسالة المستخدم
+    appendMessage(text, 'user-message');
+    userInput.value = '';
+
+    // مؤشر انتظار
+    const loadingId = appendMessage("جاري التفكير...", 'bot-message');
+
+    try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo", // أو يمكنك استخدام "gpt-4o-mini"
+                messages: [
+                    { role: "system", content: "أنت مساعد ذكي ولطيف تتحدث باللغة العربية." },
+                    { role: "user", content: text }
+                ]
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const reply = data.choices[0].message.content;
+            document.getElementById(loadingId).innerText = reply;
+        } else {
+            console.error(data);
+            document.getElementById(loadingId).innerText = "خطأ: " + (data.error?.message || "فشل الاتصال بـ OpenAI");
+        }
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById(loadingId).innerText = "حدث خطأ أثناء الاتصال بالخادم.";
+    }
+}
+
+function appendMessage(text, className) {
+    const msgDiv = document.createElement('div');
+    const id = 'msg-' + Date.now();
+    msgDiv.id = id;
+    msgDiv.className = `message ${className}`;
+    msgDiv.innerText = text;
+    messagesList.appendChild(msgDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    return id;
+}
